@@ -9,7 +9,8 @@
 <meta name="apple-mobile-web-app-title" content="Cicilan">
 <meta name="theme-color" content="#f6f7fd">
 <title>Cicilan Saya</title>
-<link rel="apple-touch-icon" id="ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
 <style>
 :root{--bg:#f6f7fd;--card:#fff;--tx:#1a1d3a;--mut:#7b819f;--ln:#e7e9f5;--a:#6366f1;--ok:#0d9f8a;--warn:#e0612b;--g:linear-gradient(135deg,#4f6bff,#8b5cf6 58%,#14b8a6)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -71,6 +72,20 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .toast.on{opacity:1}
 .hm{margin:18px 2px 0;font-weight:650;display:flex;justify-content:space-between}
 .hm span{color:var(--mut);font-weight:400}
+.krow{display:grid;grid-template-columns:1fr 92px 34px;gap:6px;margin-top:8px;align-items:center}
+.krow input{padding:9px 10px;font-size:15px}
+.krow button{border:0;background:none;color:var(--warn);font-size:18px}
+.kn{font-size:12.5px;color:var(--mut);margin-top:12px}
+.proj{display:flex;align-items:flex-end;gap:4px;height:112px;margin-top:6px}
+.proj div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:2px;height:100%;font-size:9px;color:var(--mut)}
+.proj i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--g)}
+.proj div.cur span:last-child{color:var(--a);font-weight:700}
+.gr{padding:11px 0;border-top:1px solid var(--ln);cursor:pointer}
+.gr:first-of-type{border-top:0}
+.gr .a{display:flex;justify-content:space-between}
+.gr small{color:var(--mut)}
+.note{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff7ed;border:1px solid #fde1c3;color:#9a4a12;border-radius:16px;padding:10px 14px;margin-top:6px;font-size:13.5px}
+.note .btn{padding:7px 12px;font-size:13px;background:#e0612b}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -89,9 +104,10 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 
 <div class="sheet" id="sf" onclick="if(event.target===this)closeS()"><div>
   <h3 id="ft">Catat hutang baru</h3>
-  <label>Nama</label><input id="fn" placeholder="Contoh: Kartu BNI - iPhone">
+  <label>Nama</label><input id="fn" placeholder="Contoh: iPhone 17 iBox">
   <label>Jenis</label>
-  <select id="fs"><option>Kartu Kredit</option><option>Paylater</option><option>Mitraguna / Bank</option><option>Pinjaman Kantor</option><option>Lainnya</option></select>
+  <select id="fs" onchange="fillK()"><option>Kartu Kredit</option><option>Paylater</option><option>Mitraguna / Bank</option><option>Pinjaman Kantor</option><option>Lainnya</option></select>
+  <div id="kr"><label>Kartu / paylater</label><select id="fk" onchange="newK()"></select></div>
   <label>Cicilan per bulan (Rp)</label><input id="fc" inputmode="numeric" placeholder="620000">
   <div class="two">
     <div><label>Sisa tenor (bulan)</label><input id="fz" inputmode="numeric" placeholder="11"></div>
@@ -102,18 +118,29 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 </div></div>
 
 <div class="sheet" id="ss" onclick="if(event.target===this)closeS()"><div>
-  <h3>Cadangan data</h3>
-  <p style="color:var(--mut);margin:4px 0 0">Data tersimpan di HP ini saja. Cadangkan secara berkala ke iCloud atau Files, agar aman kalau HP diganti atau data terhapus.</p>
-  <button class="btn full" onclick="backup()">Cadangkan data</button>
-  <label style="margin-top:18px">Pulihkan dari file cadangan</label>
+  <h3>Pengaturan</h3>
+  <label>Kartu kredit dan paylater (limit boleh dikosongkan)</label>
+  <div id="sc"></div>
+  <div class="two" style="margin-top:12px"><input id="nk" placeholder="Nama baru"><select id="nj"><option>Kartu Kredit</option><option>Paylater</option></select></div>
+  <button class="btn full" style="margin-top:10px" onclick="addK()">Tambah</button>
+  <label style="margin-top:18px">Gaji bulanan (opsional, untuk rasio beban)</label>
+  <input id="sg" inputmode="numeric" placeholder="Kosongkan jika tidak perlu" onchange="setG(this.value)">
+  <label style="margin-top:18px">Cadangan data</label>
+  <p style="color:var(--mut);margin:0">Data hanya tersimpan di HP ini. Cadangkan berkala ke iCloud atau Files.</p>
+  <button class="btn full" style="margin-top:10px" onclick="backup()">Cadangkan data</button>
+  <label>Pulihkan dari file cadangan</label>
   <input type="file" id="fr" accept=".json,application/json" onchange="restore(this)">
 </div></div>
 <div class="toast" id="to"></div>
 
 <script>
 const K='cicilan.v1',$=id=>document.getElementById(id);
-let S={h:[],r:[]},tab='dash',q='',fl='Semua',eid=null;
+const PRE=[['Mandiri Traveloka','Kartu Kredit'],['Mandiri Shopee','Kartu Kredit'],['BNI','Kartu Kredit'],['BRI','Kartu Kredit'],['UOB','Kartu Kredit'],['BSI Hasanah','Kartu Kredit'],['Shopee PayLater','Paylater'],['TikTok PayLater','Paylater'],['Kredivo','Paylater']];
+const presetC=()=>PRE.map((p,i)=>({id:'k'+i,nama:p[0],jenis:p[1],limit:0}));
+let S={h:[],r:[],c:null,set:{}},tab='dash',q='',fl='Semua',eid=null,pm='cepat';
 try{S=Object.assign(S,JSON.parse(localStorage.getItem(K)))}catch(e){}
+if(!Array.isArray(S.c))S.c=presetC();
+S.set=S.set||{};
 const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('Gagal menyimpan data')}};
 const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
 const bln=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
@@ -121,46 +148,71 @@ const tgl=()=>{const d=new Date();return bln()+'-'+String(d.getDate()).padStart(
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=v=>parseInt(String(v).replace(/\D/g,''),10)||0;
 const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const isK=j=>j==='Kartu Kredit'||j==='Paylater';
+const kn=id=>(S.c.find(c=>c.id===id)||{}).nama;
+const gOf=x=>kn(x.kid)||(isK(x.src)?'Belum dikelompokkan':x.src);
 function toast(t){const e=$('to');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2000)}
 function go(t){tab=t;scrollTo(0,0);R()}
+function setF(s){fl=s;R()}
+function goF(s){fl=s;go('list')}
 
 function R(){
   const m=bln();
   $('sub').textContent=new Date().toLocaleDateString('id-ID',{month:'long',year:'numeric'});
   $('v').innerHTML=tab==='dash'?dash(m):tab==='list'?list():hist();
-  if(tab==='list')I();
+  if(tab==='list'&&S.h.length)I();
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+}
+function empty(){return `<div class="empty"><b>Belum ada hutang</b>Tekan tombol + Catat untuk menambahkan hutang pertama Anda.</div>`}
+function bk(){
+  const b=S.set.bk,d=b?Math.floor((Date.now()-new Date(b))/864e5):null;
+  return d!==null&&d<30?'':`<div class="note"><span>${b?'Terakhir dicadangkan '+d+' hari lalu':'Data belum pernah dicadangkan'}</span><button class="btn" onclick="backup()">Cadangkan</button></div>`;
 }
 function dash(m){
   if(!S.h.length)return empty();
-  const a=S.h.filter(x=>x.sisa>0);
-  const paid=S.h.filter(x=>x.last===m),due=a.filter(x=>x.last!==m);
+  const a=S.h.filter(x=>x.sisa>0),paid=S.h.filter(x=>x.last===m),due=a.filter(x=>x.last!==m);
   const pa=sum(paid,x=>x.cic),da=sum(due,x=>x.cic),tot=pa+da,pct=tot?Math.round(pa/tot*100):100;
-  const soon=[...a].sort((x,y)=>x.sisa-y.sisa).slice(0,3);
-  const grp={};a.forEach(x=>grp[x.src]=(grp[x.src]||0)+x.cic*x.sisa);
-  const total=sum(a,x=>x.cic*x.sisa);
-  return `<div class="hero"><div class="l">Total sisa kewajiban</div><div class="big">${rp(total)}</div>
+  return bk()+`<div class="hero" style="margin-top:12px"><div class="l">Total sisa kewajiban</div><div class="big">${rp(sum(a,x=>x.cic*x.sisa))}</div>
   <div class="row"><div><span class="l">Cicilan per bulan</span><b>${rp(sum(a,x=>x.cic))}</b></div><div><span class="l">Hutang aktif</span><b>${a.length} dari ${S.h.length}</b></div></div></div>
   <div class="card"><h2>Bulan ini</h2><div class="bar"><i style="width:${pct}%"></i></div>
-  <div class="split"><span>Sudah dibayar <b>${rp(pa)}</b></span><span>Belum <b>${rp(da)}</b></span></div></div>
-  ${soon.length?`<div class="card"><h2>Segera lunas</h2>${soon.map(x=>`<div class="li"><div>${esc(x.nama)}</div><span>${x.sisa} bulan lagi</span></div>`).join('')}</div>`:''}
-  ${Object.keys(grp).length?`<div class="card"><h2>Sisa per jenis</h2>${Object.entries(grp).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<div class="li"><div>${esc(k)}</div><b>${rp(v)}</b></div>`).join('')}</div>`:''}`;
+  <div class="split"><span>Sudah dibayar <b>${rp(pa)}</b></span><span>Belum <b>${rp(da)}</b></span></div>
+  ${S.set.gaji>0?`<div class="split"><span>Beban cicilan</span><b>${Math.round(tot/S.set.gaji*100)}% dari gaji</b></div>`:''}</div>`
+  +grp(a)+proj(m)+lunas(a);
 }
-function empty(){return `<div class="empty"><b>Belum ada hutang</b>Tekan tombol + Catat untuk menambahkan hutang pertama Anda.</div>`}
+function grp(a){
+  if(!a.length)return '';
+  const g={};a.forEach(x=>{const k=gOf(x),o=g[k]=g[k]||{c:0,s:0,n:0,id:x.kid};o.c+=x.cic;o.s+=x.cic*x.sisa;o.n++});
+  const t=sum(a,x=>x.cic*x.sisa)||1;
+  return `<div class="card"><h2>Beban per tagihan</h2>`+Object.entries(g).sort((x,y)=>y[1].s-x[1].s).map(([k,o])=>{
+    const c=S.c.find(c=>c.id===o.id),lim=c&&c.limit>0?' · limit terpakai '+Math.round(o.s/c.limit*100)+'%':'';
+    return `<div class="gr" data-f="${esc(k)}" onclick="goF(this.dataset.f)"><div class="a"><b>${esc(k)}</b><b>${rp(o.s)}</b></div><div class="bar" style="margin:7px 0 5px"><i style="width:${Math.round(o.s/t*100)}%"></i></div><small>${rp(o.c)}/bulan · ${o.n} cicilan${lim}</small></div>`}).join('')+`</div>`;
+}
+function proj(m){
+  const v=Array(12).fill(0),d=new Date();
+  S.h.forEach(x=>{const e=x.last===m?x.sisa:x.sisa-1;for(let i=0;i<=e&&i<12;i++)v[i]+=x.cic});
+  const mx=Math.max(...v,1),f=n=>n>=1e6?(n/1e6).toFixed(1).replace('.',',')+'jt':Math.round(n/1000)+'rb';
+  return `<div class="card"><h2>Proyeksi beban 12 bulan</h2><div class="proj">`+v.map((n,i)=>`<div class="${i?'':'cur'}"><span>${n?f(n):''}</span><i style="height:${Math.max(3,Math.round(n/mx*64))}px"></i><span>${new Date(d.getFullYear(),d.getMonth()+i,1).toLocaleDateString('id-ID',{month:'short'})}</span></div>`).join('')+`</div></div>`;
+}
+function lunas(a){
+  if(!a.length)return '';
+  const s=[...a].sort(pm==='cepat'?(x,y)=>x.sisa-y.sisa:(x,y)=>y.cic-x.cic).slice(0,5);
+  return `<div class="card"><h2>Urutan pelunasan</h2><div class="chips" style="padding-top:0"><button class="${pm==='cepat'?'on':''}" onclick="pm='cepat';R()">Paling cepat selesai</button><button class="${pm==='besar'?'on':''}" onclick="pm='besar';R()">Cicilan terbesar</button></div>`
+  +s.map(x=>`<div class="li"><div>${esc(x.nama)}<br><span>${x.sisa} bulan lagi</span></div><b>${rp(x.cic)}/bln</b></div>`).join('')+`</div>`;
+}
 function list(){
   if(!S.h.length)return empty();
-  const src=['Semua',...new Set(S.h.map(x=>x.src))];
-  if(!src.includes(fl))fl='Semua';
+  const gs=['Semua',...new Set(S.h.map(gOf))];
+  if(!gs.includes(fl))fl='Semua';
   return `<input id="qs" placeholder="Cari hutang" value="${esc(q)}" oninput="q=this.value;I()" style="margin-top:6px">
-  <div class="chips">${src.map(s=>`<button class="${s===fl?'on':''}" onclick="fl='${esc(s)}';R()">${esc(s)}</button>`).join('')}</div><div id="it"></div>`;
+  <div class="chips">${gs.map(s=>`<button class="${s===fl?'on':''}" data-f="${esc(s)}" onclick="setF(this.dataset.f)">${esc(s)}</button>`).join('')}</div><div id="it"></div>`;
 }
 function I(){
   const m=bln(),k=q.toLowerCase();
-  const a=S.h.filter(x=>(fl==='Semua'||x.src===fl)&&x.nama.toLowerCase().includes(k)).sort((x,y)=>(x.sisa<=0)-(y.sisa<=0)||x.nama.localeCompare(y.nama));
+  const a=S.h.filter(x=>(fl==='Semua'||gOf(x)===fl)&&x.nama.toLowerCase().includes(k)).sort((x,y)=>(x.sisa<=0)-(y.sisa<=0)||x.nama.localeCompare(y.nama));
   $('it').innerHTML=a.length?a.map(x=>{
     const p=x.tot?Math.round((x.tot-x.sisa)/x.tot*100):0;
     const b=x.sisa<=0&&x.last!==m?`<button class="btn lunas" disabled>Lunas</button>`:x.last===m?`<button class="btn done" onclick="undo('${x.id}')">Sudah dibayar</button>`:`<button class="btn" onclick="pay('${x.id}')">Bayar</button>`;
-    return `<div class="item"><div class="t" onclick="openForm('${x.id}')"><div><div class="n">${esc(x.nama)}</div><span class="tag">${esc(x.src)}</span></div>
+    return `<div class="item"><div class="t" onclick="openForm('${x.id}')"><div><div class="n">${esc(x.nama)}</div><span class="tag">${esc(gOf(x))}</span></div>
     <div class="p">${rp(x.cic)}<span>${x.sisa>0?x.sisa+' bulan lagi':'selesai'}</span></div></div>
     <div class="act"><div class="bar"><i style="width:${p}%"></i></div>${b}</div></div>`}).join(''):`<div class="empty">Tidak ada hasil.</div>`;
 }
@@ -181,21 +233,36 @@ function undo(id){
   x.sisa++;x.last='';const i=S.r.findIndex(r=>r.hid===id);if(i>-1)S.r.splice(i,1);
   save();R();toast('Pembayaran dibatalkan');
 }
+function fillK(sel){
+  const j=$('fs').value;$('kr').style.display=isK(j)?'block':'none';
+  if(!isK(j))return;
+  const o=S.c.filter(c=>c.jenis===j).sort((a,b)=>a.nama.localeCompare(b.nama));
+  $('fk').innerHTML='<option value="">Pilih...</option>'+o.map(c=>`<option value="${c.id}">${esc(c.nama)}</option>`).join('')+'<option value="__new">+ Tambah baru...</option>';
+  $('fk').value=sel||'';
+}
+function newK(){
+  if($('fk').value!=='__new')return;
+  const n=(prompt('Nama kartu atau paylater baru')||'').trim();
+  if(!n){fillK();return}
+  const c={id:'k'+Date.now().toString(36),nama:n,jenis:$('fs').value,limit:0};S.c.push(c);save();fillK(c.id);
+}
 function openForm(id){
   eid=id||null;const x=id&&S.h.find(h=>h.id===id);
   $('ft').textContent=x?'Ubah hutang':'Catat hutang baru';
-  $('fn').value=x?x.nama:'';$('fs').value=x?x.src:'Kartu Kredit';
+  $('fn').value=x?x.nama:'';$('fs').value=x?x.src:'Kartu Kredit';fillK(x?x.kid:'');
   $('fc').value=x?x.cic:'';$('fz').value=x?x.sisa:'';$('ft2').value=x?x.tot:'';
   $('fd').style.display=x?'block':'none';$('sf').classList.add('on');
 }
 function saveForm(){
-  const nama=$('fn').value.trim(),cic=num($('fc').value),sisa=num($('fz').value);
+  const nama=$('fn').value.trim(),cic=num($('fc').value),sisa=num($('fz').value),src=$('fs').value;
+  let kid=isK(src)?$('fk').value:'';if(kid==='__new')kid='';
   if(!nama)return toast('Isi nama hutang');
+  if(isK(src)&&!kid)return toast('Pilih kartu atau paylater');
   if(!cic)return toast('Isi cicilan per bulan');
   if(!$('fz').value.trim())return toast('Isi sisa tenor');
-  const tot=Math.max(num($('ft2').value),sisa),src=$('fs').value;
-  if(eid){Object.assign(S.h.find(h=>h.id===eid),{nama,src,cic,sisa,tot})}
-  else S.h.push({id:Date.now().toString(36),nama,src,cic,sisa,tot,last:''});
+  const tot=Math.max(num($('ft2').value),sisa);
+  if(eid){Object.assign(S.h.find(h=>h.id===eid),{nama,src,kid,cic,sisa,tot})}
+  else S.h.push({id:Date.now().toString(36),nama,src,kid,cic,sisa,tot,last:''});
   save();closeS();R();toast(eid?'Perubahan disimpan':'Hutang ditambahkan');
 }
 function delItem(){
@@ -203,26 +270,45 @@ function delItem(){
   S.h=S.h.filter(h=>h.id!==eid);save();closeS();R();toast('Hutang dihapus');
 }
 function closeS(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on'))}
-function openSet(){$('ss').classList.add('on')}
+function openSet(){setH();$('ss').classList.add('on')}
+function setH(){
+  $('sg').value=S.set.gaji||'';
+  $('sc').innerHTML=['Kartu Kredit','Paylater'].map(j=>{
+    const l=S.c.filter(c=>c.jenis===j).sort((a,b)=>a.nama.localeCompare(b.nama));
+    return l.length?`<div class="kn">${j}</div>`+l.map(c=>`<div class="krow"><input value="${esc(c.nama)}" onchange="updK('${c.id}','nama',this.value)"><input inputmode="numeric" placeholder="Limit" value="${c.limit||''}" onchange="updK('${c.id}','limit',this.value)"><button onclick="delK('${c.id}')" aria-label="Hapus">✕</button></div>`).join(''):'';
+  }).join('')||'<div class="kn">Belum ada kartu atau paylater.</div>';
+}
+function updK(id,f,v){
+  const c=S.c.find(c=>c.id===id);if(!c)return;
+  if(f==='nama'){v=v.trim();if(!v)return setH();c.nama=v}else c.limit=num(v);
+  save();R();setH();
+}
+function delK(id){
+  const c=S.c.find(c=>c.id===id);if(!c)return;
+  if(S.h.some(x=>x.kid===id))return toast('Masih dipakai oleh hutang');
+  if(!confirm('Hapus "'+c.nama+'"?'))return;
+  S.c=S.c.filter(c=>c.id!==id);save();setH();
+}
+function addK(){
+  const n=$('nk').value.trim();if(!n)return toast('Isi nama kartu atau paylater');
+  S.c.push({id:'k'+Date.now().toString(36),nama:n,jenis:$('nj').value,limit:0});$('nk').value='';save();setH();toast('Ditambahkan');
+}
+function setG(v){S.set.gaji=num(v);save();R()}
 async function backup(){
   const f=new File([JSON.stringify(S)],'cadangan-cicilan-'+tgl()+'.json',{type:'application/json'});
-  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();toast('Cadangan diunduh');
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});S.set.bk=tgl();save();R();return}}catch(e){if(e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();
+  S.set.bk=tgl();save();R();toast('Cadangan diunduh');
 }
 function restore(inp){
   const f=inp.files[0];if(!f)return;
   f.text().then(t=>{
     const d=JSON.parse(t);if(!Array.isArray(d.h)||!Array.isArray(d.r))throw 0;
     if(!confirm('Ganti semua data saat ini dengan data dari cadangan?'))return;
-    S=d;save();closeS();R();toast('Data dipulihkan');
+    S=Object.assign({h:[],r:[],c:null,set:{}},d);if(!Array.isArray(S.c))S.c=presetC();S.set=S.set||{};
+    save();closeS();R();toast('Data dipulihkan');
   }).catch(()=>toast('File cadangan tidak valid'));inp.value='';
 }
-(function(){
-  const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,180,180);
-  g.addColorStop(0,'#4f6bff');g.addColorStop(.6,'#8b5cf6');g.addColorStop(1,'#14b8a6');x.fillStyle=g;x.fillRect(0,0,180,180);
-  x.fillStyle='#fff';x.font='700 76px -apple-system,Helvetica,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('Rp',90,94);
-  $('ico').href=c.toDataURL('image/png');
-})();
 R();
 </script>
 </body>
