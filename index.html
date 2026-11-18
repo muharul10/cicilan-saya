@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Cicilan">
+<meta name="theme-color" content="#f6f7fd">
+<title>Cicilan Saya</title>
+<link rel="apple-touch-icon" id="ico">
+<style>
+:root{--bg:#f6f7fd;--card:#fff;--tx:#1a1d3a;--mut:#7b819f;--ln:#e7e9f5;--a:#6366f1;--ok:#0d9f8a;--warn:#e0612b;--g:linear-gradient(135deg,#4f6bff,#8b5cf6 58%,#14b8a6)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(420px 260px at 90% -5%,#c9d2ff88,transparent),radial-gradient(380px 260px at -10% 12%,#b6f0e655,transparent);pointer-events:none}
+header{position:sticky;top:0;z-index:5;padding:calc(env(safe-area-inset-top) + 12px) 18px 10px;display:flex;align-items:center;justify-content:space-between;background:#f6f7fdcc;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+h1{margin:0;font-size:22px;letter-spacing:-.4px}
+header small{color:var(--mut);display:block;font-size:13px}
+.ib{width:38px;height:38px;border-radius:12px;border:1px solid var(--ln);background:#ffffffb0;display:grid;place-items:center;color:var(--mut)}
+main{position:relative;padding:6px 16px 130px;max-width:560px;margin:auto}
+.hero{background:var(--g);color:#fff;border-radius:24px;padding:20px;box-shadow:0 14px 30px -12px #6366f1aa}
+.hero .l{opacity:.85;font-size:13px}
+.hero .big{font-size:32px;font-weight:750;letter-spacing:-1px;margin:2px 0 14px}
+.hero .row{display:flex;gap:10px}
+.hero .row div{flex:1;background:#ffffff26;border:1px solid #ffffff38;border-radius:16px;padding:10px 12px;backdrop-filter:blur(8px)}
+.hero .row b{display:block;font-size:15px}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:14px 16px;margin-top:12px}
+.card h2{margin:0 0 10px;font-size:15px}
+.bar{height:8px;border-radius:9px;background:#eceefb;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--g)}
+.split{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mut);margin-top:8px}
+.split b{color:var(--tx)}
+.li{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--ln)}
+.li:first-of-type{border-top:0}
+.li span{color:var(--mut);font-size:13px}
+.item{background:var(--card);border:1px solid var(--ln);border-radius:18px;padding:14px;margin-top:10px}
+.item .t{display:flex;justify-content:space-between;gap:10px;cursor:pointer}
+.item .n{font-weight:650}
+.tag{display:inline-block;font-size:12px;color:var(--a);background:#eef0ff;border-radius:8px;padding:1px 8px;margin-top:3px}
+.item .p{text-align:right;font-weight:700;white-space:nowrap}
+.item .p span{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.act{display:flex;align-items:center;gap:12px;margin-top:12px}
+.act .bar{flex:1}
+.btn{border:0;border-radius:12px;padding:9px 16px;font:inherit;font-weight:650;background:var(--g);color:#fff}
+.btn.done{background:#e3f6f2;color:var(--ok)}
+.btn.lunas{background:#eceefb;color:var(--mut)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.chips button{flex:none;border:1px solid var(--ln);background:#fff;border-radius:20px;padding:6px 14px;font:inherit;font-size:13px;color:var(--mut)}
+.chips button.on{background:var(--tx);border-color:var(--tx);color:#fff}
+input,select{width:100%;font:inherit;font-size:16px;border:1px solid var(--ln);background:#fff;border-radius:14px;padding:12px 14px;color:var(--tx);outline:0}
+input:focus,select:focus{border-color:var(--a);box-shadow:0 0 0 3px #6366f126}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 5px}
+.empty{text-align:center;color:var(--mut);padding:40px 20px}
+.empty b{display:block;color:var(--tx);font-size:17px;margin-bottom:4px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;justify-content:space-around;padding:8px 12px calc(env(safe-area-inset-bottom) + 8px);background:#ffffffc8;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--ln)}
+nav button{flex:1;border:0;background:none;font:inherit;font-size:11.5px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px}
+nav button.on{color:var(--a);font-weight:650}
+svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fab{position:fixed;right:18px;bottom:calc(env(safe-area-inset-bottom) + 76px);z-index:7;border:0;border-radius:18px;padding:14px 20px;font:inherit;font-weight:700;color:#fff;background:var(--g);box-shadow:0 12px 24px -8px #6366f1bb}
+.sheet{position:fixed;inset:0;z-index:20;display:none;background:#1a1d3a66;align-items:flex-end}
+.sheet.on{display:flex}
+.sheet>div{width:100%;max-width:560px;margin:auto;background:#fff;border-radius:26px 26px 0 0;padding:18px 18px calc(env(safe-area-inset-bottom) + 18px);max-height:92vh;overflow:auto;animation:up .22s ease-out}
+@keyframes up{from{transform:translateY(40px);opacity:.4}}
+.sheet h3{margin:0 0 4px;font-size:19px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{width:100%;margin-top:18px;padding:14px}
+.link{border:0;background:none;color:var(--warn);font:inherit;width:100%;margin-top:8px;padding:10px}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 64px);transform:translateX(-50%);background:var(--tx);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;z-index:30;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+.hm{margin:18px 2px 0;font-weight:650;display:flex;justify-content:space-between}
+.hm span{color:var(--mut);font-weight:400}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Cicilan Saya</h1><small id="sub"></small></div>
+  <button class="ib" onclick="openSet()" aria-label="Pengaturan"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+<main id="v"></main>
+<button class="fab" onclick="openForm()">+ Catat</button>
+<nav>
+  <button data-t="dash" onclick="go('dash')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Ringkasan</button>
+  <button data-t="list" onclick="go('list')"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Daftar</button>
+  <button data-t="hist" onclick="go('hist')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Riwayat</button>
+</nav>
+
+<div class="sheet" id="sf" onclick="if(event.target===this)closeS()"><div>
+  <h3 id="ft">Catat hutang baru</h3>
+  <label>Nama</label><input id="fn" placeholder="Contoh: Kartu BNI - iPhone">
+  <label>Jenis</label>
+  <select id="fs"><option>Kartu Kredit</option><option>Paylater</option><option>Mitraguna / Bank</option><option>Pinjaman Kantor</option><option>Lainnya</option></select>
+  <label>Cicilan per bulan (Rp)</label><input id="fc" inputmode="numeric" placeholder="620000">
+  <div class="two">
+    <div><label>Sisa tenor (bulan)</label><input id="fz" inputmode="numeric" placeholder="11"></div>
+    <div><label>Tenor awal (opsional)</label><input id="ft2" inputmode="numeric" placeholder="24"></div>
+  </div>
+  <button class="btn full" onclick="saveForm()">Simpan</button>
+  <button class="link" id="fd" onclick="delItem()">Hapus hutang ini</button>
+</div></div>
+
+<div class="sheet" id="ss" onclick="if(event.target===this)closeS()"><div>
+  <h3>Cadangan data</h3>
+  <p style="color:var(--mut);margin:4px 0 0">Data tersimpan di HP ini saja. Cadangkan secara berkala ke iCloud atau Files, agar aman kalau HP diganti atau data terhapus.</p>
+  <button class="btn full" onclick="backup()">Cadangkan data</button>
+  <label style="margin-top:18px">Pulihkan dari file cadangan</label>
+  <input type="file" id="fr" accept=".json,application/json" onchange="restore(this)">
+</div></div>
+<div class="toast" id="to"></div>
+
+<script>
+const K='cicilan.v1',$=id=>document.getElementById(id);
+let S={h:[],r:[]},tab='dash',q='',fl='Semua',eid=null;
+try{S=Object.assign(S,JSON.parse(localStorage.getItem(K)))}catch(e){}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('Gagal menyimpan data')}};
+const rp=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
+const bln=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const tgl=()=>{const d=new Date();return bln()+'-'+String(d.getDate()).padStart(2,'0')};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>parseInt(String(v).replace(/\D/g,''),10)||0;
+const sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+function toast(t){const e=$('to');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),2000)}
+function go(t){tab=t;scrollTo(0,0);R()}
+
+function R(){
+  const m=bln();
+  $('sub').textContent=new Date().toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+  $('v').innerHTML=tab==='dash'?dash(m):tab==='list'?list():hist();
+  if(tab==='list')I();
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
+}
+function dash(m){
+  if(!S.h.length)return empty();
+  const a=S.h.filter(x=>x.sisa>0);
+  const paid=S.h.filter(x=>x.last===m),due=a.filter(x=>x.last!==m);
+  const pa=sum(paid,x=>x.cic),da=sum(due,x=>x.cic),tot=pa+da,pct=tot?Math.round(pa/tot*100):100;
+  const soon=[...a].sort((x,y)=>x.sisa-y.sisa).slice(0,3);
+  const grp={};a.forEach(x=>grp[x.src]=(grp[x.src]||0)+x.cic*x.sisa);
+  const total=sum(a,x=>x.cic*x.sisa);
+  return `<div class="hero"><div class="l">Total sisa kewajiban</div><div class="big">${rp(total)}</div>
+  <div class="row"><div><span class="l">Cicilan per bulan</span><b>${rp(sum(a,x=>x.cic))}</b></div><div><span class="l">Hutang aktif</span><b>${a.length} dari ${S.h.length}</b></div></div></div>
+  <div class="card"><h2>Bulan ini</h2><div class="bar"><i style="width:${pct}%"></i></div>
+  <div class="split"><span>Sudah dibayar <b>${rp(pa)}</b></span><span>Belum <b>${rp(da)}</b></span></div></div>
+  ${soon.length?`<div class="card"><h2>Segera lunas</h2>${soon.map(x=>`<div class="li"><div>${esc(x.nama)}</div><span>${x.sisa} bulan lagi</span></div>`).join('')}</div>`:''}
+  ${Object.keys(grp).length?`<div class="card"><h2>Sisa per jenis</h2>${Object.entries(grp).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<div class="li"><div>${esc(k)}</div><b>${rp(v)}</b></div>`).join('')}</div>`:''}`;
+}
+function empty(){return `<div class="empty"><b>Belum ada hutang</b>Tekan tombol + Catat untuk menambahkan hutang pertama Anda.</div>`}
+function list(){
+  if(!S.h.length)return empty();
+  const src=['Semua',...new Set(S.h.map(x=>x.src))];
+  if(!src.includes(fl))fl='Semua';
+  return `<input id="qs" placeholder="Cari hutang" value="${esc(q)}" oninput="q=this.value;I()" style="margin-top:6px">
+  <div class="chips">${src.map(s=>`<button class="${s===fl?'on':''}" onclick="fl='${esc(s)}';R()">${esc(s)}</button>`).join('')}</div><div id="it"></div>`;
+}
+function I(){
+  const m=bln(),k=q.toLowerCase();
+  const a=S.h.filter(x=>(fl==='Semua'||x.src===fl)&&x.nama.toLowerCase().includes(k)).sort((x,y)=>(x.sisa<=0)-(y.sisa<=0)||x.nama.localeCompare(y.nama));
+  $('it').innerHTML=a.length?a.map(x=>{
+    const p=x.tot?Math.round((x.tot-x.sisa)/x.tot*100):0;
+    const b=x.sisa<=0&&x.last!==m?`<button class="btn lunas" disabled>Lunas</button>`:x.last===m?`<button class="btn done" onclick="undo('${x.id}')">Sudah dibayar</button>`:`<button class="btn" onclick="pay('${x.id}')">Bayar</button>`;
+    return `<div class="item"><div class="t" onclick="openForm('${x.id}')"><div><div class="n">${esc(x.nama)}</div><span class="tag">${esc(x.src)}</span></div>
+    <div class="p">${rp(x.cic)}<span>${x.sisa>0?x.sisa+' bulan lagi':'selesai'}</span></div></div>
+    <div class="act"><div class="bar"><i style="width:${p}%"></i></div>${b}</div></div>`}).join(''):`<div class="empty">Tidak ada hasil.</div>`;
+}
+function hist(){
+  if(!S.r.length)return `<div class="empty"><b>Belum ada pembayaran</b>Setiap pembayaran yang Anda tandai akan muncul di sini.</div>`;
+  const g={};S.r.forEach(x=>(g[x.tgl.slice(0,7)]=g[x.tgl.slice(0,7)]||[]).push(x));
+  return Object.keys(g).sort().reverse().map(k=>{
+    const [y,mo]=k.split('-'),nm=new Date(y,mo-1).toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    return `<div class="hm">${nm}<span>${rp(sum(g[k],x=>x.jml))}</span></div><div class="card" style="margin-top:8px">${g[k].map(x=>`<div class="li"><div>${esc(x.nama)}<br><span>${new Date(x.tgl).toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</span></div><b>${rp(x.jml)}</b></div>`).join('')}</div>`}).join('');
+}
+function pay(id){
+  const x=S.h.find(h=>h.id===id);if(!x||x.sisa<=0||x.last===bln())return;
+  x.sisa--;x.last=bln();S.r.unshift({id:Date.now().toString(36),hid:id,nama:x.nama,jml:x.cic,tgl:tgl()});
+  save();R();toast(x.sisa>0?'Pembayaran dicatat':'Lunas, selamat!');
+}
+function undo(id){
+  const x=S.h.find(h=>h.id===id);if(!x||!confirm('Batalkan pembayaran bulan ini untuk "'+x.nama+'"?'))return;
+  x.sisa++;x.last='';const i=S.r.findIndex(r=>r.hid===id);if(i>-1)S.r.splice(i,1);
+  save();R();toast('Pembayaran dibatalkan');
+}
+function openForm(id){
+  eid=id||null;const x=id&&S.h.find(h=>h.id===id);
+  $('ft').textContent=x?'Ubah hutang':'Catat hutang baru';
+  $('fn').value=x?x.nama:'';$('fs').value=x?x.src:'Kartu Kredit';
+  $('fc').value=x?x.cic:'';$('fz').value=x?x.sisa:'';$('ft2').value=x?x.tot:'';
+  $('fd').style.display=x?'block':'none';$('sf').classList.add('on');
+}
+function saveForm(){
+  const nama=$('fn').value.trim(),cic=num($('fc').value),sisa=num($('fz').value);
+  if(!nama)return toast('Isi nama hutang');
+  if(!cic)return toast('Isi cicilan per bulan');
+  if(!$('fz').value.trim())return toast('Isi sisa tenor');
+  const tot=Math.max(num($('ft2').value),sisa),src=$('fs').value;
+  if(eid){Object.assign(S.h.find(h=>h.id===eid),{nama,src,cic,sisa,tot})}
+  else S.h.push({id:Date.now().toString(36),nama,src,cic,sisa,tot,last:''});
+  save();closeS();R();toast(eid?'Perubahan disimpan':'Hutang ditambahkan');
+}
+function delItem(){
+  const x=S.h.find(h=>h.id===eid);if(!x||!confirm('Hapus "'+x.nama+'"? Riwayat pembayarannya tetap tersimpan.'))return;
+  S.h=S.h.filter(h=>h.id!==eid);save();closeS();R();toast('Hutang dihapus');
+}
+function closeS(){document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('on'))}
+function openSet(){$('ss').classList.add('on')}
+async function backup(){
+  const f=new File([JSON.stringify(S)],'cadangan-cicilan-'+tgl()+'.json',{type:'application/json'});
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){if(e.name==='AbortError')return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();toast('Cadangan diunduh');
+}
+function restore(inp){
+  const f=inp.files[0];if(!f)return;
+  f.text().then(t=>{
+    const d=JSON.parse(t);if(!Array.isArray(d.h)||!Array.isArray(d.r))throw 0;
+    if(!confirm('Ganti semua data saat ini dengan data dari cadangan?'))return;
+    S=d;save();closeS();R();toast('Data dipulihkan');
+  }).catch(()=>toast('File cadangan tidak valid'));inp.value='';
+}
+(function(){
+  const c=document.createElement('canvas');c.width=c.height=180;const x=c.getContext('2d'),g=x.createLinearGradient(0,0,180,180);
+  g.addColorStop(0,'#4f6bff');g.addColorStop(.6,'#8b5cf6');g.addColorStop(1,'#14b8a6');x.fillStyle=g;x.fillRect(0,0,180,180);
+  x.fillStyle='#fff';x.font='700 76px -apple-system,Helvetica,Arial';x.textAlign='center';x.textBaseline='middle';x.fillText('Rp',90,94);
+  $('ico').href=c.toDataURL('image/png');
+})();
+R();
+</script>
+</body>
+</html>
